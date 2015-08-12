@@ -33,7 +33,7 @@ from PySide.QtCore import Qt, SLOT, QUrl
 from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
-from PySide.QtGui import QIcon, QStyleFactory
+from PySide.QtGui import QIcon, QStyleFactory, QFrame
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
 homedir = os.path.expanduser('~')
@@ -69,8 +69,7 @@ class window(QMainWindow):
         super(window, self).__init__(parent)
         app.aboutToQuit.connect(self.myExitHandler)
 
-        with open(os.path.join(basedir, 'assets', 'style.css'), 'r') as file:
-            style_sheet = file.read()
+        style_sheet = self.styleSheet('style')
         #app.setStyle(QStyleFactory.create('Macintosh'))
         #app.setStyleSheet(style_sheet)
 
@@ -78,11 +77,14 @@ class window(QMainWindow):
         self.new_tab_behavior = "insert"
         global bookmarks
 
-        # Global menubar
-        # menubar = QMenuBar()
+        global menubar
+        menubar = QMenuBar()
 
         # Initialize a statusbar for the window
         self.statusbar = self.statusBar()
+        self.statusbar.setFont(QFont("Helvetica Neue", 11, QFont.Normal));
+        self.statusbar.setStyleSheet(style_sheet)
+        self.statusbar.setMinimumHeight(15)
 
         self.pbar = QProgressBar()
         self.pbar.setMaximumWidth(100)
@@ -123,19 +125,32 @@ class window(QMainWindow):
         input_layout.addWidget(self.nbutton)
 
         # create a widget to hold the input layout
-        self.input_widget = QWidget()
+        self.input_widget = QFrame()
+        self.input_widget.setObjectName("InputWidget")
         self.input_widget.setStyleSheet(style_sheet)
 
         # set the layout of the widget
         self.input_widget.setLayout(input_layout)
         self.input_widget.setVisible(True)
 
+        # CREATE BOOKMARK-LINE HERE
+
         # create tabs
         self.tabs = QTabWidget()
-        self.tabs.setStyleSheet(style_sheet)
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
         self.new_tab()
+
+        tabs_layout = QHBoxLayout()
+        tabs_layout.setSpacing(0)
+        tabs_layout.setContentsMargins(0, 0, 0, 0)
+        tabs_layout.addWidget(self.tabs)
+
+        self.tabs_widget = QFrame()
+        self.tabs_widget.setObjectName("TabLine")
+        self.tabs_widget.setStyleSheet(style_sheet)
+        self.tabs_widget.setLayout(tabs_layout)
+        self.tabs_widget.setVisible(True)
 
         gsettings = self.tabs.currentWidget().settings().globalSettings()
         gsettings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
@@ -150,7 +165,7 @@ class window(QMainWindow):
         vlayout.setSpacing(0)
         vlayout.setContentsMargins(0, 0, 0, 0)
         vlayout.addWidget(self.input_widget)
-        vlayout.addWidget(self.tabs, 1)
+        vlayout.addWidget(self.tabs_widget, 1)
         vlayout.addWidget(self.inspector)
 
         # create a widget to hold the vertical layout
@@ -358,6 +373,15 @@ class window(QMainWindow):
         self.rbutton.setText(u"↻")
         self.rbutton.clicked.connect(self.tabs.currentWidget().reload)
         self.pbar.hide()
+
+    def styleSheet(self, style_sheet):
+        """Load stylesheet."""
+        try:
+            with open(os.path.join(basedir, 'assets', 'style.qss'), 'r') as file:
+                return file.read()
+        except Exception, e:
+            # print e
+            return ''
 
     def myExitHandler(self):
         """Exiting."""

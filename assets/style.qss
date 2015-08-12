@@ -1,0 +1,98 @@
+QTabWidget::pane { /* The tab widget frame */
+    /*border-top: 1px solid rgba(161, 161, 161);*/
+    border-bottom: 1px solid rgba(184, 184, 184);
+    position: absolute;
+    top: 0;
+}
+
+QTabWidget::tab-bar {
+    alignment: left;
+}
+
+/* Style the tab using the tab sub-control. Note that
+     it reads QTabBar _not_ QTabWidget */
+QTabBar::tab {
+    /*background: rgba(189, 189, 189);*/
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(194, 194, 194), stop: 1.0 rgba(189, 189, 189));
+    border: 1px solid rgba(165, 165, 165);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    min-width: 8ex;
+    padding: 4px 32px 4px 16px;
+}
+
+QTabBar::tab:selected {
+    /*background: rgba(210, 210, 210);*/
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(212, 212, 212), stop: 1.0 rgba(207, 207, 207));
+    border: 1px solid rgba(181, 181, 181);
+}
+
+QTabBar::tab:hover {
+    /*background: rgba(180, 180, 180);*/
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(185, 185, 185), stop: 1.0 rgba(180, 180, 180));
+    border: 1px solid rgba(157, 157, 157);
+}
+
+QWidget {
+    background: none;
+}
+
+#InputWidget {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(230, 230, 230), stop: 1.0 rgba(220, 220, 220));
+}
+
+#BookmarkWidget {
+    border-top: 1px solid rgba(197, 197, 197);
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(219, 219, 219), stop: 1.0 rgba(213, 213, 213));
+}
+
+#TabLine {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(194, 194, 194), stop: 1.0 rgba(189, 189, 189));
+}
+
+QLineEdit {
+    margin-top: 3px;
+}
+
+QLineEdit, QPushButton {
+    background-color: rgba(252, 252, 252);
+    border: 0px 0px 0px 1px solid rgba(200, 200, 200);
+    border-radius: 3px 3px 3px 3px;
+    padding: 2px;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+QPushButton {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 4px;
+}
+
+QPushButton:checked {
+    background-color: rgba(228, 228, 228);
+}
+
+QStatusBar {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(219, 219, 219), stop: 1.0 rgba(216, 216, 216));
+}
+
+/* The following is not currently applied to any widget */
+
+QProgressBar:horizontal {
+    text-align: right;
+    margin-right: 4ex;
+}
+
+QProgressBar::chunk:horizontal {
+    margin-right: 2px; /* space */
+    width: 10px;
+}
+/* Note that you need set the height for vertical progress bars. You can use “:indeterminate” for indeterminate progress bars. */

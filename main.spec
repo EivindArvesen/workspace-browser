@@ -17,7 +17,7 @@ a = Analysis(
  runtime_hooks=None,
  excludes=None)
 
-extrafiles = [(os.path.join("assets", 'style.css'), os.path.join("assets", 'style.css'), 'DATA')]
+extrafiles = [(os.path.join("assets", 'style.qss'), os.path.join("assets", 'style.qss'), 'DATA')]
 
 pyz = PYZ (a.pure)
 exe = EXE( pyz,
