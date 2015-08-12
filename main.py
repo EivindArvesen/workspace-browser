@@ -3,9 +3,11 @@
 
 """
 TODO:
+- Tooltip: entire linkt text on mouse hover
 - Fix tab bar with DocumentMode
 - Use toolbar instead?
 - Menubar
+- Make scrollbars like native mac
 - Custom startpage (look like duckduckgo, built upon custom page, use small_icon for logo and colors)
 - For tab-index: pickle(history) in(task/folder/index.pickle)
 - Modularization
@@ -157,6 +159,7 @@ class window(QMainWindow):
         self.tabs.setDocumentMode(False)
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
+        self.tabs.tabBar().hide()
         self.new_tab()
 
         tabs_layout = QHBoxLayout()
@@ -314,6 +317,8 @@ class window(QMainWindow):
             self.tabs.appendTab(tab, unicode(tab.title()))
         self.tabs.setCurrentWidget(tab)
         self.tabs.setUpdatesEnabled(True)
+        #tab.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
+        #tab.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         tab.titleChanged.connect(self.change_tab)
         tab.urlChanged.connect(self.change_tab)
 

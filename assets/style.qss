@@ -38,6 +38,13 @@ QTabBar::tab:hover {
     border: 1px solid rgba(157, 157, 157);
 }
 
+QTabBar::tab:selected:hover {
+    /*background: rgba(210, 210, 210);*/
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 rgba(212, 212, 212), stop: 1.0 rgba(207, 207, 207));
+    border: 1px solid rgba(181, 181, 181);
+}
+
 QWidget {
     background: none;
 }
@@ -84,6 +91,10 @@ QPushButton:checked {
 QStatusBar {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 rgba(219, 219, 219), stop: 1.0 rgba(216, 216, 216));
+}
+
+QScrollBar {
+    background: #32CC99;
 }
 
 /* The following is not currently applied to any widget */

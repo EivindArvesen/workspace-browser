@@ -116,6 +116,6 @@ will automatically export your environment and update the ```requirements.txt```
 This software is released under the terms of the 3-clause New BSD License. See the [license](LICENSE.txt) file for details.
 
 [PySide](https://wiki.qt.io/PySide) is released under [LGPL](https://www.gnu.org/copyleft/lesser.html).
-It's source code is available on [GitHub](https://github.com/PySide).
+Its source code is available on [GitHub](https://github.com/PySide).
 
 The application icon is built upon [Spectacle Flat Icons](https://dribbble.com/shots/2075892-Spectacle-Flat-Icons) and [The Axe](https://dribbble.com/shots/1702501-The-Axe).
