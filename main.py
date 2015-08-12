@@ -3,6 +3,7 @@
 
 """
 TODO:
+- Home button
 - For tab-index: pickle(history) in(task/folder/index.pickle)
 - Task view; save/load, etc.
 - Read paper (http://www.informationr.net/ir/17-4/paper547.html#.VcnnrXg6mvs)
