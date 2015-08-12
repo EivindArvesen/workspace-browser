@@ -1,0 +1,74 @@
+ QTabWidget::pane { /* The tab widget frame */
+    border-top: 1px solid rgba(161, 161, 161);
+    position: absolute;
+    top: 0;
+    background: rgba(180, 180, 180);
+ }
+
+ QTabWidget::tab-bar {
+    alignment: left;
+ }
+
+ /* Style the tab using the tab sub-control. Note that
+     it reads QTabBar _not_ QTabWidget */
+ QTabBar::tab {
+    background: rgba(189, 189, 189);
+    border: 1px solid rgba(165, 165, 165);
+    border-bottom: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    min-width: 8ex;
+    padding: 4px 32px 4px 16px;
+ }
+
+QTabBar::tab:selected {
+    background: rgba(210, 210, 210);
+    border: 1px solid rgba(181, 181, 181);
+    border-bottom: none;
+}
+
+QTabBar::tab:hover {
+    background: rgba(180, 180, 180);
+    border: 1px solid rgba(157, 157, 157);
+    border-bottom: none;
+}
+
+QWidget {
+    background: rgba(210, 210, 210);
+    padding-bottom: 3px;
+}
+
+QLineEdit {
+    margin-top: 3px;
+}
+
+QLineEdit, QPushButton {
+    background-color: rgba(252, 252, 252);
+    border: 0px 0px 0px 1px solid rgba(200, 200, 200);
+    border-radius: 3px 3px 3px 3px;
+    padding: 2px;
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+QPushButton {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 4px;
+}
+
+QPushButton:checked {
+    background-color: rgba(228, 228, 228);
+}
+
+/* The following is not currently applied to any widget */
+
+QProgressBar:horizontal {
+text-align: right;
+margin-right: 4ex;
+}
+QProgressBar::chunk:horizontal {
+margin-right: 2px; /* space */
+width: 10px;
+}
+/* Note that you need set the height for vertical progress bars. You can use “:indeterminate” for indeterminate progress bars. */
