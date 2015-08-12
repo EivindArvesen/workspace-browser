@@ -1,32 +1,6 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-"""
-TODO:
-- Tooltip: entire linkt text on mouse hover
-- Fix tab bar with DocumentMode
-- Use toolbar instead?
-- Menubar
-- Make scrollbars like native mac
-- Custom startpage (look like duckduckgo, built upon custom page, use small_icon for logo and colors)
-- For tab-index: pickle(history) in(task/folder/index.pickle)
-- Modularization
-- Task view; save/load, etc.
-- Read paper (http://www.informationr.net/ir/17-4/paper547.html#.VcnnrXg6mvs)
-- Read slides (http://www.slideshare.net/mohanrajrm/a-taskfocused-approach-to-support-sharing-and-interruption-recovery-in-web-browsers)
-- Search page for text (http://stackoverflow.com/questions/26912152/search-text-and-scroll-down-with-qwebview)
-- Detach tabs, turn into separate windows (http://stackoverflow.com/questions/14872763/how-to-pop-out-a-separate-window-from-a-tabwidget-in-pyside-qt)
-- Drag tabs between windows
-- URL text align center on focus, left else (https://srinikom.github.io/pyside-docs/PySide/QtGui/QLineEdit.html#PySide.QtGui.PySide.QtGui.QLineEdit.setAlignment)
-- Swiping gestures back and forth
-- url completion from history (log)
-- autocompletion for omnibar google search
-- Settings (https://deptinfo-ensip.univ-poitiers.fr/ENS/pyside-docs/PySide/QtWebKit/QWebSettings.html#PySide.QtWebKit.PySide.QtWebKit.QWebSettings.WebAttribute)
-- Holding click on back/forward should bring up dropdown-menu (tab history)
-- Most Recently Used tab order/switching?
-- Unit tests (nose)
-"""
-
 import os
 import pickle
 import signal
