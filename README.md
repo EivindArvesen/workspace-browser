@@ -1,6 +1,16 @@
 # Raskolnikov
-<!---
+<!--
 Build icons, etc.
+For instance:
+[![travis][travis-image]][travis-url]
+[![cc-gpa][cc-gpa-image]][cc-gpa-url]
+[![cc-coverage][cc-coverage-image]][cc-coverage-url]
+[travis-image]: https://travis-ci.org/ekonstantinidis/gitify.svg?branch=master
+[travis-url]: https://travis-ci.org/ekonstantinidis/gitify
+[cc-gpa-image]: https://codeclimate.com/github/ekonstantinidis/gitify/badges/gpa.svg
+[cc-gpa-url]: https://codeclimate.com/github/ekonstantinidis/gitify
+[cc-coverage-image]: https://codeclimate.com/github/ekonstantinidis/gitify/badges/coverage.svg
+[cc-coverage-url]: https://codeclimate.com/github/ekonstantinidis/gitify/coverage
 -->
 
 ![Screenshot](res/small_icon.png)
@@ -36,7 +46,12 @@ This approach can result in clutter, many open windows, and potentially performa
 Saves a collection of tabs (and windows), reducing both visual clutter and CPU load. Use of this approach also discourages multitasking - cognitive context switching is generally accepted to impede performance - and facilitates the widely used strategy of organizing related tasks in groups.
 
 ## Installation
-Binaries can be found
+Binaries can be downloaded from the [releases](https://github.com/eivind88/raskolnikov/releases) page.
+
+As Raskolnikov is under rapid development, these may be outdated, and infrequently updated.
+
+Alternatively, you can install Raskolnikov in one of the following ways:
+
 ### Automatic environment setup
 If you don't have Python installed, already have the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda/) installed or don't have any preference regarding Python distribution, the included `setup.sh` can set up a development environment for you.
 Running
@@ -63,16 +78,39 @@ If you'd like to build the application yourself, you also need to install PyInst
 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
 ```
 
-### Contributions
+### Distribution
+To prepare the application for distribution after setting up the development environment, run:
+```
+bash dev/build.sh
+```
+This script runs PyInstaller on the included ```main.spec```,
+and outputs a packaged application in a newly created folder ```dist```.
+
+Currently supports only OS X.
+
+<!--
+UPDATE THIS AFTER NOSETESTS ARE WRITTEN!
+### Tests
+There are 3 types of tests: `jest`, `jscs` and `jsxhint`.
+To run the tests:
+```
+npm test
+```
+-->
+
+## Contributions
 Feedback is very much appreciated.
+
 If you run into a bug or would like to see a new feature, please open a new issue.
+
 Contributions in the form of code (e.g. implementing new features, bug-fixes) are also appreciated.
 Just fork the repo, check out a new branch with an informative name, commit your changes and send a pull request.
+
 In the case of any new dependencies, running
 ```
 bash dev/export-env.sh
 ```
-will automatically export your environment and update the requirements-/environment-files (provided you are using a conda env).
+will automatically export your environment and update the ```requirements.txt``` (provided you are using a conda env).
 
 ## License
 This software is released under the terms of the 3-clause New BSD License. See the [license](LICENSE.txt) file for details.
