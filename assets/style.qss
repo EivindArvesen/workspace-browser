@@ -19,7 +19,9 @@ QTabBar::tab {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     min-width: 8ex;
-    padding: 4px 32px 4px 16px;
+    /*padding: 4px 32px 4px 16px;*/
+    padding-top: 4px;
+    padding-bottom: 4px;
 }
 
 QTabBar::tab:selected {

@@ -3,6 +3,8 @@
 
 """
 TODO:
+- Fix tab bar with DocumentMode
+- Use toolbar instead?
 - Menubar
 - Custom startpage (look like duckduckgo, built upon custom page, use small_icon for logo and colors)
 - For tab-index: pickle(history) in(task/folder/index.pickle)
@@ -29,11 +31,11 @@ import signal
 import sys
 import tempfile
 # import just what is needed
-from PySide.QtCore import Qt, SLOT, QUrl
+from PySide.QtCore import Qt, SLOT, QUrl, QSettings
 from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
-from PySide.QtGui import QIcon, QStyleFactory, QFrame
+from PySide.QtGui import QIcon, QStyleFactory, QFrame, QDesktopServices
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
 homedir = os.path.expanduser('~')
@@ -69,9 +71,19 @@ class window(QMainWindow):
         super(window, self).__init__(parent)
         app.aboutToQuit.connect(self.myExitHandler)
 
-        style_sheet = self.styleSheet('style')
+        self.style_sheet = self.styleSheet('style')
         #app.setStyle(QStyleFactory.create('Macintosh'))
         #app.setStyleSheet(style_sheet)
+
+        app.setOrganizationName("Eivind Arvesen")
+        app.setOrganizationDomain("https://github.com/eivind88/raskolnikov")
+        app.setApplicationName("Raskolnikov")
+        app.setApplicationVersion("0.0.1")
+        settings = QSettings()
+
+        self.data_location = QDesktopServices.DataLocation
+        self.temp_location = QDesktopServices.TempLocation
+        self.cache_location = QDesktopServices.CacheLocation
 
         self.startpage = "https://duckduckgo.com/"
         self.new_tab_behavior = "insert"
@@ -83,7 +95,7 @@ class window(QMainWindow):
         # Initialize a statusbar for the window
         self.statusbar = self.statusBar()
         self.statusbar.setFont(QFont("Helvetica Neue", 11, QFont.Normal));
-        self.statusbar.setStyleSheet(style_sheet)
+        self.statusbar.setStyleSheet(self.style_sheet)
         self.statusbar.setMinimumHeight(15)
 
         self.pbar = QProgressBar()
@@ -93,7 +105,12 @@ class window(QMainWindow):
         self.statusbar.hide()
 
         self.setMinimumSize(504, 235)
+        #self.setWindowModified(True)
+        #app.alert(self, 0)
         self.setWindowTitle("Raskolnikov")
+        #toolbar = self.addToolBar('Toolbar')
+        #toolbar.addAction(exitAction)
+        #self.setUnifiedTitleAndToolBarOnMac(True)
         self.setWindowIcon(QIcon(""))
 
         # Create input widgets
@@ -127,7 +144,7 @@ class window(QMainWindow):
         # create a widget to hold the input layout
         self.input_widget = QFrame()
         self.input_widget.setObjectName("InputWidget")
-        self.input_widget.setStyleSheet(style_sheet)
+        self.input_widget.setStyleSheet(self.style_sheet)
 
         # set the layout of the widget
         self.input_widget.setLayout(input_layout)
@@ -137,6 +154,7 @@ class window(QMainWindow):
 
         # create tabs
         self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(False)
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
         self.new_tab()
@@ -148,7 +166,7 @@ class window(QMainWindow):
 
         self.tabs_widget = QFrame()
         self.tabs_widget.setObjectName("TabLine")
-        self.tabs_widget.setStyleSheet(style_sheet)
+        self.tabs_widget.setStyleSheet(self.style_sheet)
         self.tabs_widget.setLayout(tabs_layout)
         self.tabs_widget.setVisible(True)
 
@@ -164,6 +182,7 @@ class window(QMainWindow):
         vlayout = QVBoxLayout()
         vlayout.setSpacing(0)
         vlayout.setContentsMargins(0, 0, 0, 0)
+        #toolbar.addWidget(self.input_widget)
         vlayout.addWidget(self.input_widget)
         vlayout.addWidget(self.tabs_widget, 1)
         vlayout.addWidget(self.inspector)
@@ -263,7 +282,7 @@ class window(QMainWindow):
         self.edit.setFocus()
 
     def toggle_input(self):
-        """Toggle toolbar visibility."""
+        """Toggle input visibility."""
         if self.input_widget.isVisible():
             visible = False
         else:
@@ -314,6 +333,8 @@ class window(QMainWindow):
             #print e
             self.tabs.tabBar().hide();
             self.new_tab()
+
+        self.tabs_widget.setStyleSheet(self.style_sheet + "QTabBar::tab { width:" + str(self.tabs.widget(self.tabs.currentIndex()).size().width()/self.tabs.count()) + "px; }")
 
     def previous_tab(self):
         """Previous tab."""
