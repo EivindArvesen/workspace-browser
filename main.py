@@ -3,8 +3,10 @@
 
 """
 TODO:
-- Home button
+- Menubar
+- Custom startpage (look like duckduckgo, built upon custom page, use small_icon for logo and colors)
 - For tab-index: pickle(history) in(task/folder/index.pickle)
+- Modularization
 - Task view; save/load, etc.
 - Read paper (http://www.informationr.net/ir/17-4/paper547.html#.VcnnrXg6mvs)
 - Read slides (http://www.slideshare.net/mohanrajrm/a-taskfocused-approach-to-support-sharing-and-interruption-recovery-in-web-browsers)
@@ -89,19 +91,20 @@ class window(QMainWindow):
         self.statusbar.hide()
 
         self.setMinimumSize(504, 235)
-        self.setWindowTitle("Browser")
+        self.setWindowTitle("Raskolnikov")
         self.setWindowIcon(QIcon(""))
 
         # Create input widgets
         self.bbutton = QPushButton("<")
         self.fbutton = QPushButton(">")
+        self.hbutton = QPushButton(u"⌂")
         self.edit = QLineEdit("")
         self.edit.setFont(QFont("Helvetica Neue", 12, QFont.Normal));
         self.edit.setPlaceholderText("Enter URL")
         #self.edit.setMinimumSize(400, 24)
         self.rbutton = QPushButton(u"↻")
+        self.dbutton = QPushButton(u"☆")
         self.nbutton = QPushButton(u"+")
-        self.book = QPushButton(u"☆")
 
         self.edit.setTextMargins(2, 1, 2, 0)
 
@@ -113,9 +116,10 @@ class window(QMainWindow):
         # add the input widgets to the input layout
         input_layout.addWidget(self.bbutton)
         input_layout.addWidget(self.fbutton)
-        input_layout.addWidget(self.book)
+        input_layout.addWidget(self.hbutton)
         input_layout.addWidget(self.edit)
         input_layout.addWidget(self.rbutton)
+        input_layout.addWidget(self.dbutton)
         input_layout.addWidget(self.nbutton)
 
         # create a widget to hold the input layout
@@ -156,10 +160,11 @@ class window(QMainWindow):
 
         self.bbutton.clicked.connect(self.tabs.currentWidget().back)
         self.fbutton.clicked.connect(self.tabs.currentWidget().forward)
-        self.book.clicked.connect(self.bookmark)
+        self.hbutton.clicked.connect(self.goHome)
         self.edit.returnPressed.connect(self.set_url)
         # Add button signal to "go" slot
         self.rbutton.clicked.connect(self.tabs.currentWidget().reload)
+        self.dbutton.clicked.connect(self.bookmark)
         self.nbutton.clicked.connect(self.new_tab)
         self.tabs.tabCloseRequested.connect(self.tabs.removeTab)
         self.tabs.currentChanged.connect(self.change_tab)
@@ -230,6 +235,9 @@ class window(QMainWindow):
 
     def release_button(self):
         self.sender().setStyleSheet('background-color: rgba(252, 252, 252)')
+
+    def goHome(self):
+        self.tabs.currentWidget().setUrl(QUrl(self.startpage))
 
     def handleShowInspector(self):
         self.inspector.setShown(self.inspector.isHidden())
