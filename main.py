@@ -138,7 +138,26 @@ class window(QMainWindow):
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
         self.tabs.tabBar().hide()
-        self.new_tab()
+
+        if saved_tabs:
+            for tab in saved_tabs['tabs']:
+                new_tab = QWebView()
+                #for page in tab['history']:
+                #    new_tab.load(QUrl(page['url']))
+                #new_tab.history().goToItem(new_tab.history().itemAt(tab['current_history']))
+                new_tab.load(QUrl(tab['history'][tab['current_history']]['url']))
+                self.tabs.setUpdatesEnabled(False)
+                if self.new_tab_behavior == "insert":
+                    self.tabs.insertTab(self.tabs.currentIndex()+1, new_tab,
+                                        unicode(new_tab.title()))
+                elif self.new_tab_behavior == "append":
+                    self.tabs.appendTab(new_tab, unicode(new_tab.title()))
+                self.tabs.setUpdatesEnabled(True)
+                new_tab.titleChanged.connect(self.change_tab)
+                new_tab.urlChanged.connect(self.change_tab)
+            self.tabs.setCurrentIndex(saved_tabs['current_tab'])
+        else:
+            self.new_tab()
 
         tabs_layout = QHBoxLayout()
         tabs_layout.setSpacing(0)
@@ -397,7 +416,7 @@ class window(QMainWindow):
         pb = {'current_tab': self.tabs.currentIndex()}
         pb['tabs'] = list()
         for tab in range(self.tabs.count()):
-            pb['tabs'].append(dict(current_history=self.tabs.widget(tab).history().currentItemIndex(), history=list(dict(title=item.title(), url=item.url().toEncoded()) for item in self.tabs.widget(tab).history().items())))
+            pb['tabs'].append(dict(current_history=self.tabs.widget(tab).history().currentItemIndex(), history=list(dict(title=item.title(), url=item.url()) for item in self.tabs.widget(tab).history().items())))
 
         #print 'Current:', self.tabs.currentIndex(), unicode(self.tabs.currentWidget().title()), self.tabs.currentWidget().url().toEncoded()
         #for tab in range(self.tabs.count()):
