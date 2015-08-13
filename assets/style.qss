@@ -7,6 +7,7 @@ QTabWidget::pane { /* The tab widget frame */
 
 QTabWidget::tab-bar {
     alignment: left;
+    min-height: 32px;
 }
 
 /* Style the tab using the tab sub-control. Note that
@@ -20,8 +21,8 @@ QTabBar::tab {
     border-top-right-radius: 0;
     min-width: 8ex;
     /*padding: 4px 32px 4px 16px;*/
-    padding-top: 4px;
-    padding-bottom: 4px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 QTabBar::tab:selected {
@@ -52,6 +53,7 @@ QWidget {
 #InputWidget {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 rgba(230, 230, 230), stop: 1.0 rgba(220, 220, 220));
+    padding: 1px 8px 2px 8px;
 }
 
 #BookmarkWidget {

@@ -7,7 +7,7 @@ import signal
 import sys
 import tempfile
 # import just what is needed
-from PySide.QtCore import Qt, SLOT, QUrl, QSettings
+from PySide.QtCore import Qt, SLOT, QUrl, QSettings, SIGNAL
 from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
@@ -27,16 +27,17 @@ else:
 
 tabFile = os.path.join(homedir, "saved_tabs.p")
 try:
-    b = open(tabFile,"rb")
+    b = open(tabFile, "rb")
     saved_tabs = pickle.loads(b.read())
     b.close()
 except Exception, e:
-    #print e
+    # print e
     file = open(tabFile, "w")
     for line in '':
-       file.write(line)
+        file.write(line)
     file.close()
     saved_tabs = ''
+
 
 class window(QMainWindow):
 
@@ -48,8 +49,8 @@ class window(QMainWindow):
         app.aboutToQuit.connect(self.myExitHandler)
 
         self.style_sheet = self.styleSheet('style')
-        #app.setStyle(QStyleFactory.create('Macintosh'))
-        #app.setStyleSheet(style_sheet)
+        # app.setStyle(QStyleFactory.create('Macintosh'))
+        # app.setStyleSheet(style_sheet)
 
         app.setOrganizationName("Eivind Arvesen")
         app.setOrganizationDomain("https://github.com/eivind88/raskolnikov")
@@ -74,7 +75,7 @@ class window(QMainWindow):
 
         # Initialize a statusbar for the window
         self.statusbar = self.statusBar()
-        self.statusbar.setFont(QFont("Helvetica Neue", 11, QFont.Normal));
+        self.statusbar.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
         self.statusbar.setStyleSheet(self.style_sheet)
         self.statusbar.setMinimumHeight(15)
 
@@ -85,12 +86,12 @@ class window(QMainWindow):
         self.statusbar.hide()
 
         self.setMinimumSize(504, 235)
-        #self.setWindowModified(True)
-        #app.alert(self, 0)
+        # self.setWindowModified(True)
+        # app.alert(self, 0)
         self.setWindowTitle("Raskolnikov")
-        #toolbar = self.addToolBar('Toolbar')
-        #toolbar.addAction(exitAction)
-        #self.setUnifiedTitleAndToolBarOnMac(True)
+        # toolbar = self.addToolBar('Toolbar')
+        # toolbar.addAction(exitAction)
+        # self.setUnifiedTitleAndToolBarOnMac(True)
         self.setWindowIcon(QIcon(""))
 
         # Create input widgets
@@ -98,9 +99,9 @@ class window(QMainWindow):
         self.fbutton = QPushButton(">")
         self.hbutton = QPushButton(u"⌂")
         self.edit = QLineEdit("")
-        self.edit.setFont(QFont("Helvetica Neue", 12, QFont.Normal));
+        self.edit.setFont(QFont("Helvetica Neue", 12, QFont.Normal))
         self.edit.setPlaceholderText("Enter URL")
-        #self.edit.setMinimumSize(400, 24)
+        # self.edit.setMinimumSize(400, 24)
         self.rbutton = QPushButton(u"↻")
         self.dbutton = QPushButton(u"☆")
         self.nbutton = QPushButton(u"+")
@@ -110,7 +111,7 @@ class window(QMainWindow):
         # create a horizontal layout for the input
         input_layout = QHBoxLayout()
         input_layout.setSpacing(4)
-        input_layout.setContentsMargins(0, 8, 0, 0)
+        input_layout.setContentsMargins(0, 0, 0, 0)
 
         # add the input widgets to the input layout
         input_layout.addWidget(self.bbutton)
@@ -138,12 +139,16 @@ class window(QMainWindow):
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
         self.tabs.tabBar().hide()
+        self.tabs.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
 
         if saved_tabs:
             for tab in saved_tabs['tabs']:
                 new_tab = QWebView()
                 #for page in tab['history']:
                 #    new_tab.load(QUrl(page['url']))
+                #print tab['current_history']
+                #for item in new_tab.history().items():
+                #    print item
                 #new_tab.history().goToItem(new_tab.history().itemAt(tab['current_history']))
                 new_tab.load(QUrl(tab['history'][tab['current_history']]['url']))
                 self.tabs.setUpdatesEnabled(False)
@@ -172,7 +177,8 @@ class window(QMainWindow):
 
         gsettings = self.tabs.currentWidget().settings().globalSettings()
         gsettings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
-        gsettings.setAttribute(QWebSettings.AcceleratedCompositingEnabled, True)
+        gsettings.setAttribute(QWebSettings.AcceleratedCompositingEnabled,
+            True)
 
         self.inspector = QWebInspector(self)
         self.inspector.setPage(self.tabs.currentWidget().page())
@@ -182,7 +188,7 @@ class window(QMainWindow):
         vlayout = QVBoxLayout()
         vlayout.setSpacing(0)
         vlayout.setContentsMargins(0, 0, 0, 0)
-        #toolbar.addWidget(self.input_widget)
+        # toolbar.addWidget(self.input_widget)
         vlayout.addWidget(self.input_widget)
         vlayout.addWidget(self.tabs_widget, 1)
         vlayout.addWidget(self.inspector)
@@ -203,7 +209,8 @@ class window(QMainWindow):
         self.tabs.tabCloseRequested.connect(self.tabs.removeTab)
         self.tabs.currentChanged.connect(self.change_tab)
 
-        widgets = (input_layout.itemAt(i).widget() for i in range(input_layout.count()))
+        widgets = (input_layout.itemAt(i).widget() for i in range(
+            input_layout.count()))
         for widget in widgets:
             if isinstance(widget, QPushButton):
                 widget.setFixedSize(33, 21)
@@ -257,23 +264,27 @@ class window(QMainWindow):
         self.tabs.currentWidget().page().linkHovered.connect(self.linkHover)
 
         # finally set the attribute need to rotate
-        #try:
-        #    self.setAttribute(Qt.WA_Maemo5AutoOrientation, True)
-        #except:
-        #    print "not maemo"
+        # try:
+        #     self.setAttribute(Qt.WA_Maemo5AutoOrientation, True)
+        # except:
+        #     print "not maemo"
 
         self.statusbar.show()
 
     def press_button(self):
+        """On button press. Connected."""
         self.sender().setStyleSheet('background-color: rgba(228, 228, 228)')
 
     def release_button(self):
+        """On button release. Connected."""
         self.sender().setStyleSheet('background-color: rgba(252, 252, 252)')
 
     def goHome(self):
+        """Go to startpage."""
         self.tabs.currentWidget().setUrl(QUrl(self.startpage))
 
     def handleShowInspector(self):
+        """Toggle web inspector."""
         self.inspector.setShown(self.inspector.isHidden())
 
     def focus_adress(self):
@@ -297,6 +308,7 @@ class window(QMainWindow):
             self.showFullScreen()
 
     def linkHover(self, l):
+        """Show link adress in status bar on mouse hover."""
         self.statusbar.showMessage(l)
 
     def bookmark(self):
@@ -314,36 +326,40 @@ class window(QMainWindow):
             self.tabs.appendTab(tab, unicode(tab.title()))
         self.tabs.setCurrentWidget(tab)
         self.tabs.setUpdatesEnabled(True)
-        #tab.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
-        #tab.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
+        # tab.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
+        # tab.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         tab.titleChanged.connect(self.change_tab)
         tab.urlChanged.connect(self.change_tab)
 
     def change_tab(self):
         """Change active tab."""
-        if self.tabs.count()<=1:
-            self.tabs.tabBar().hide();
+        if self.tabs.count() <= 1:
+            self.tabs.tabBar().hide()
         else:
-            self.tabs.tabBar().show();
+            self.tabs.tabBar().show()
 
         try:
             self.edit.setText(str(self.tabs.currentWidget().url().toEncoded()))
             self.tabs.setTabText(self.tabs.currentIndex(),
                                  unicode(self.tabs.currentWidget().title()))
             self.tabs.currentWidget().setFocus()
-        except Exception, e:
-            #print e
-            self.tabs.tabBar().hide();
+        except Exception:
+            self.tabs.tabBar().hide()
             self.new_tab()
 
-        self.tabs_widget.setStyleSheet(self.style_sheet + "QTabBar::tab { width:" + str(self.tabs.widget(self.tabs.currentIndex()).size().width()/self.tabs.count()) + "px; }")
+        self.tabs_widget.setStyleSheet(self.style_sheet +
+                                       "QTabBar::tab { width:" + str(
+                                        self.tabs.widget(
+                                            self.tabs.currentIndex()
+                                            ).size().width()/self.tabs.count()
+                                        ) + "px; }")
 
     def previous_tab(self):
         """Previous tab."""
         try:
             self.tabs.setCurrentIndex(self.tabs.currentIndex()-1)
             self.change_tab()
-        except Exception, e:
+        except Exception:
             pass
             #print str(e)
 
@@ -352,9 +368,9 @@ class window(QMainWindow):
         try:
             self.tabs.setCurrentIndex(self.tabs.currentIndex()+1)
             self.change_tab()
-        except Exception, e:
+        except Exception: #, e
             pass
-            #print str(e)
+            # print str(e)
 
     def close_tab(self):
         """Close tab."""
@@ -400,31 +416,32 @@ class window(QMainWindow):
     def styleSheet(self, style_sheet):
         """Load stylesheet."""
         try:
-            with open(os.path.join(basedir, 'assets', 'style.qss'), 'r') as file:
+            with open(os.path.join
+                      (basedir, 'assets', 'style.qss'), 'r') as file:
                 return file.read()
-        except Exception, e:
+        except Exception:
             # print e
             return ''
+
+    def resizeEvent(self, evt=None):
+        """Called on window resize."""
+        self.change_tab()
 
     def myExitHandler(self):
         """Exiting."""
         pass
         global tabFile
 
-        # {current_tab: 1, tabs:[0: {current_history:3, history:[{title, url}]]}
-        # {current_tab: 1, tabs:[0: {current_history:3, history:obj}]}
+    # {current_tab: 1, tabs:[0: {current_history:3, history:[{title, url}]]}
         pb = {'current_tab': self.tabs.currentIndex()}
         pb['tabs'] = list()
         for tab in range(self.tabs.count()):
-            pb['tabs'].append(dict(current_history=self.tabs.widget(tab).history().currentItemIndex(), history=list(dict(title=item.title(), url=item.url()) for item in self.tabs.widget(tab).history().items())))
+            pb['tabs'].append(dict(current_history=self.tabs.widget(
+                tab).history().currentItemIndex(), history=list(dict(
+                    title=item.title(), url=item.url()
+                    ) for item in self.tabs.widget(tab).history().items())))
 
-        #print 'Current:', self.tabs.currentIndex(), unicode(self.tabs.currentWidget().title()), self.tabs.currentWidget().url().toEncoded()
-        #for tab in range(self.tabs.count()):
-        #    print 'Tab:', tab, unicode(self.tabs.widget(tab).title()), self.tabs.widget(tab).url().toEncoded()
-        #    for item in self.tabs.widget(tab).history().items():
-        #        print '    ', item.title(), item.url().toEncoded()
-
-        #print pb
+        # print pb
         pickle.dump(pb, open(tabFile, "wb"))
 
 
