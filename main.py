@@ -151,6 +151,7 @@ class window(QMainWindow):
                 #    print item
                 #new_tab.history().goToItem(new_tab.history().itemAt(tab['current_history']))
                 new_tab.load(QUrl(tab['history'][tab['current_history']]['url']))
+                tab['current_history']
                 self.tabs.setUpdatesEnabled(False)
                 if self.new_tab_behavior == "insert":
                     self.tabs.insertTab(self.tabs.currentIndex()+1, new_tab,
@@ -160,6 +161,14 @@ class window(QMainWindow):
                 self.tabs.setUpdatesEnabled(True)
                 new_tab.titleChanged.connect(self.change_tab)
                 new_tab.urlChanged.connect(self.change_tab)
+                new_tab.loadStarted.connect(self.load_start)
+                new_tab.loadFinished.connect(self.load_finish)
+                new_tab.loadProgress.connect(self.pbar.setValue)
+                new_tab.page().linkHovered.connect(self.linkHover)
+
+            for index, tab in enumerate(saved_tabs['tabs']):
+                self.tabs.setTabText(index, tab['history'][tab['current_history']]['title'])
+
             self.tabs.setCurrentIndex(saved_tabs['current_tab'])
         else:
             self.new_tab()
@@ -256,13 +265,6 @@ class window(QMainWindow):
         sequence = QKeySequence(Qt.CTRL + Qt.ALT + Qt.Key_U)
         QShortcut(sequence, self, self.handleShowInspector)
 
-        # update view on page change
-        self.tabs.currentWidget().loadStarted.connect(self.load_start)
-        self.tabs.currentWidget().loadFinished.connect(self.load_finish)
-
-        self.tabs.currentWidget().loadProgress.connect(self.pbar.setValue)
-        self.tabs.currentWidget().page().linkHovered.connect(self.linkHover)
-
         # finally set the attribute need to rotate
         # try:
         #     self.setAttribute(Qt.WA_Maemo5AutoOrientation, True)
@@ -325,11 +327,17 @@ class window(QMainWindow):
         elif self.new_tab_behavior == "append":
             self.tabs.appendTab(tab, unicode(tab.title()))
         self.tabs.setCurrentWidget(tab)
+        self.tabs.setTabText(self.tabs.currentIndex(),
+                             unicode(self.tabs.currentWidget().title()))
         self.tabs.setUpdatesEnabled(True)
         # tab.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         # tab.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
         tab.titleChanged.connect(self.change_tab)
         tab.urlChanged.connect(self.change_tab)
+        tab.loadStarted.connect(self.load_start)
+        tab.loadFinished.connect(self.load_finish)
+        tab.loadProgress.connect(self.pbar.setValue)
+        tab.page().linkHovered.connect(self.linkHover)
 
     def change_tab(self):
         """Change active tab."""
