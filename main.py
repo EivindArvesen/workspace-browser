@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import pickle
+import cPickle as pickle
 import signal
 import sys
 import tempfile
@@ -25,18 +25,18 @@ else:
     # we are running in a normal Python environment
     basedir = os.path.dirname(__file__)
 
-bookFile = os.path.join(homedir, "bookmarks.txt")
+tabFile = os.path.join(homedir, "saved_tabs.p")
 try:
-    b = open(bookFile,"rb")
-    bookmarks = pickle.loads(b.read())
+    b = open(tabFile,"rb")
+    saved_tabs = pickle.loads(b.read())
     b.close()
 except Exception, e:
     #print e
-    file = open(bookFile, "w")
+    file = open(tabFile, "w")
     for line in '':
        file.write(line)
     file.close()
-    bookmarks = ''
+    saved_tabs = ''
 
 class window(QMainWindow):
 
@@ -63,7 +63,11 @@ class window(QMainWindow):
 
         self.startpage = "https://duckduckgo.com/"
         self.new_tab_behavior = "insert"
+
         global bookmarks
+
+        global saved_tabs
+        print "Current saved_tabs:\n", saved_tabs
 
         global menubar
         menubar = QMenuBar()
@@ -386,11 +390,23 @@ class window(QMainWindow):
     def myExitHandler(self):
         """Exiting."""
         pass
+        global tabFile
+
+        # {current_tab: 1, tabs:[0: {current_history:3, history:[{title, url}]]}
+        # {current_tab: 1, tabs:[0: {current_history:3, history:obj}]}
+        pb = {'current_tab': self.tabs.currentIndex()}
+        pb['tabs'] = list()
+        for tab in range(self.tabs.count()):
+            pb['tabs'].append(dict(current_history=self.tabs.widget(tab).history().currentItemIndex(), history=list(dict(title=item.title(), url=item.url().toEncoded()) for item in self.tabs.widget(tab).history().items())))
+
         #print 'Current:', self.tabs.currentIndex(), unicode(self.tabs.currentWidget().title()), self.tabs.currentWidget().url().toEncoded()
         #for tab in range(self.tabs.count()):
-            #print 'Tab:', tab, unicode(self.tabs.widget(tab).title()), self.tabs.widget(tab).url().toEncoded()
-                #for item in self.tabs.widget(tab).history().items():
-                #    #print item.title(), item.url().toEncoded()
+        #    print 'Tab:', tab, unicode(self.tabs.widget(tab).title()), self.tabs.widget(tab).url().toEncoded()
+        #    for item in self.tabs.widget(tab).history().items():
+        #        print '    ', item.title(), item.url().toEncoded()
+
+        #print pb
+        pickle.dump(pb, open(tabFile, "wb"))
 
 
 if __name__ == '__main__':
