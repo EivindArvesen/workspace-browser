@@ -12,6 +12,7 @@ from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
 from PySide.QtGui import QIcon, QStyleFactory, QFrame, QDesktopServices
+from PySide.QtGui import QComboBox, QSizePolicy
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
 homedir = os.path.expanduser('~')
@@ -38,6 +39,18 @@ except Exception, e:
     file.close()
     saved_tabs = ''
 
+bookFile = os.path.join(homedir, "bookmarks.p")
+try:
+    c = open(bookFile, "rb")
+    bookmarks = pickle.loads(c.read())
+    c.close()
+except Exception, e:
+    print e
+    file = open(bookFile, "w")
+    for line in '':
+        file.write(line)
+    file.close()
+    bookmarks = []
 
 class window(QMainWindow):
 
@@ -68,7 +81,7 @@ class window(QMainWindow):
         global bookmarks
 
         global saved_tabs
-        print "Current saved_tabs:\n", saved_tabs
+        print "Currently saved_tabs:\n", saved_tabs
 
         global menubar
         menubar = QMenuBar()
@@ -105,6 +118,9 @@ class window(QMainWindow):
         self.rbutton = QPushButton(u"↻")
         self.dbutton = QPushButton(u"☆")
         self.nbutton = QPushButton(u"+")
+        self.nbutton.setObjectName("NewTab")
+        self.nbutton.setMinimumSize(35, 30)
+        self.nbutton.setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
 
         self.edit.setTextMargins(2, 1, 2, 0)
 
@@ -120,7 +136,7 @@ class window(QMainWindow):
         input_layout.addWidget(self.edit)
         input_layout.addWidget(self.rbutton)
         input_layout.addWidget(self.dbutton)
-        input_layout.addWidget(self.nbutton)
+        #input_layout.addWidget(self.nbutton)
 
         # create a widget to hold the input layout
         self.input_widget = QFrame()
@@ -132,6 +148,14 @@ class window(QMainWindow):
         self.input_widget.setVisible(True)
 
         # CREATE BOOKMARK-LINE HERE
+        self.list = QComboBox(self)
+        self.list.setMinimumSize(35,30)
+
+        for i in bookmarks:
+            self.list.addItem(unicode(i))
+
+        self.list.activated[str].connect(self.handleBookmarks)
+        self.list.view().setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
 
         # create tabs
         self.tabs = QTabWidget()
@@ -140,6 +164,10 @@ class window(QMainWindow):
         self.tabs.setMovable(True)
         self.tabs.tabBar().hide()
         self.tabs.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
+        self.tabs.setCornerWidget(self.nbutton)
+        self.tabs.cornerWidget().setObjectName("CornerWidget")
+        self.tabs.cornerWidget().setMinimumSize(10, 24)
+        self.tabs.cornerWidget().setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
 
         if saved_tabs:
             for tab in saved_tabs['tabs']:
@@ -199,6 +227,7 @@ class window(QMainWindow):
         vlayout.setContentsMargins(0, 0, 0, 0)
         # toolbar.addWidget(self.input_widget)
         vlayout.addWidget(self.input_widget)
+        vlayout.addWidget(self.list)
         vlayout.addWidget(self.tabs_widget, 1)
         vlayout.addWidget(self.inspector)
 
@@ -313,9 +342,6 @@ class window(QMainWindow):
         """Show link adress in status bar on mouse hover."""
         self.statusbar.showMessage(l)
 
-    def bookmark(self):
-        pass
-
     def new_tab(self):
         """Open new tab."""
         tab = QWebView()
@@ -355,11 +381,12 @@ class window(QMainWindow):
             self.tabs.tabBar().hide()
             self.new_tab()
 
+        print (self.tabs.widget(self.tabs.currentIndex()).size().width()-10), self.tabs.count()
         self.tabs_widget.setStyleSheet(self.style_sheet +
                                        "QTabBar::tab { width:" + str(
-                                        self.tabs.widget(
+                                        (self.tabs.widget(
                                             self.tabs.currentIndex()
-                                            ).size().width()/self.tabs.count()
+                                            ).size().width()-26-self.tabs.count()*2)/self.tabs.count()
                                         ) + "px; }")
 
     def previous_tab(self):
@@ -420,6 +447,34 @@ class window(QMainWindow):
         self.rbutton.setText(u"↻")
         self.rbutton.clicked.connect(self.tabs.currentWidget().reload)
         self.pbar.hide()
+
+        global bookmarks
+        if unicode(self.tabs.currentWidget().url().toEncoded()) in bookmarks:
+            self.dbutton.setText(u"★")
+        else:
+            self.dbutton.setText(u"☆")
+
+    def bookmark(self):
+        """Toggle bookmark."""
+        global bookmarks
+        if not self.tabs.currentWidget().url().toEncoded() in bookmarks:
+            bookmarks.append(self.tabs.currentWidget().url().toEncoded())
+
+            pickle.dump(bookmarks, open(bookFile, "wb"))
+
+            self.list.addItem(unicode(self.tabs.currentWidget().url().toEncoded()))
+            self.dbutton.setText(u"★")
+
+        else:
+            if self.tabs.currentWidget().url().toEncoded() in bookmarks: bookmarks.remove(self.tabs.currentWidget().url().toEncoded())
+            pickle.dump(bookmarks, open(bookFile, "wb"))
+            self.list.removeItem(self.list.findText(unicode(self.tabs.currentWidget().url().toEncoded())))
+            self.dbutton.setText(u"☆")
+
+    def handleBookmarks(self, choice):
+
+        url = choice
+        self.tabs.currentWidget().load(QUrl(self.startpage))
 
     def styleSheet(self, style_sheet):
         """Load stylesheet."""
