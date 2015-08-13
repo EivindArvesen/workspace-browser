@@ -53,7 +53,7 @@ QWidget {
 #InputWidget {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 rgba(230, 230, 230), stop: 1.0 rgba(220, 220, 220));
-    padding: 1px 8px 2px 8px;
+    padding: 2px 4px 1px 4px;
 }
 
 #BookmarkWidget {
