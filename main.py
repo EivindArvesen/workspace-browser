@@ -12,7 +12,7 @@ from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
 from PySide.QtGui import QIcon, QStyleFactory, QFrame, QDesktopServices
-from PySide.QtGui import QComboBox, QSizePolicy
+from PySide.QtGui import QComboBox, QSizePolicy, QListWidget
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
 homedir = os.path.expanduser('~')
@@ -63,7 +63,9 @@ class window(QMainWindow):
 
         self.style_sheet = self.styleSheet('style')
         # app.setStyle(QStyleFactory.create('Macintosh'))
-        # app.setStyleSheet(style_sheet)
+        #app.setStyleSheet(self.style_sheet)
+        self.layout().setSpacing(0)
+        self.layout().setContentsMargins(0,0,0,0)
 
         app.setOrganizationName("Eivind Arvesen")
         app.setOrganizationDomain("https://github.com/eivind88/raskolnikov")
@@ -108,8 +110,8 @@ class window(QMainWindow):
         self.setWindowIcon(QIcon(""))
 
         # Create input widgets
-        self.bbutton = QPushButton("<")
-        self.fbutton = QPushButton(">")
+        self.bbutton = QPushButton(u"<")
+        self.fbutton = QPushButton(u">")
         self.hbutton = QPushButton(u"⌂")
         self.edit = QLineEdit("")
         self.edit.setFont(QFont("Helvetica Neue", 12, QFont.Normal))
@@ -117,6 +119,8 @@ class window(QMainWindow):
         # self.edit.setMinimumSize(400, 24)
         self.rbutton = QPushButton(u"↻")
         self.dbutton = QPushButton(u"☆")
+        self.tbutton = QPushButton(u"⁐")
+        # ↆ ⇧ √ ⌘ ⏎ ⏏ ⚠ ✓ ✕ ✖ ✗ ✘ ::: ❤ ☮ ☢ ☠ ✔ ☑ ♥ ✉ ☣ ☤ ✘ ☒ ♡ ツ ☼ ☁ ❅ ✎
         self.nbutton = QPushButton(u"+")
         self.nbutton.setObjectName("NewTab")
         self.nbutton.setMinimumSize(35, 30)
@@ -136,7 +140,7 @@ class window(QMainWindow):
         input_layout.addWidget(self.edit)
         input_layout.addWidget(self.rbutton)
         input_layout.addWidget(self.dbutton)
-        #input_layout.addWidget(self.nbutton)
+        input_layout.addWidget(self.tbutton)
 
         # create a widget to hold the input layout
         self.input_widget = QFrame()
@@ -153,6 +157,9 @@ class window(QMainWindow):
 
         for i in bookmarks:
             self.list.addItem(unicode(i))
+
+        # Task list
+        #self.tasklist = LOAD
 
         self.list.activated[str].connect(self.handleBookmarks)
         self.list.view().setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
@@ -171,7 +178,36 @@ class window(QMainWindow):
 
         if saved_tabs:
             for tab in saved_tabs['tabs']:
+                tasklist = QListWidget()
+                tasklist.hide()
+                tasklist.setObjectName('taskList')
+                tasklist.setMinimumWidth(100)
+                tasklist.setMaximumWidth(250)
+
                 new_tab = QWebView()
+                new_tab.setObjectName('webView')
+
+                inspector = QWebInspector(self)
+                inspector.setObjectName('webInspector')
+                inspector.hide()
+
+                page_layout = QVBoxLayout()
+                page_layout.setSpacing(0)
+                page_layout.setContentsMargins(0, 0, 0, 0)
+                page_layout.addWidget(new_tab)
+                page_layout.addWidget(inspector)
+                page_widget = QFrame()
+                page_widget.setObjectName('pageWidget')
+                page_widget.setLayout(page_layout)
+
+                complete_tab_layout = QHBoxLayout()
+                complete_tab_layout.setSpacing(0)
+                complete_tab_layout.setContentsMargins(0, 0, 0, 0)
+                complete_tab_layout.addWidget(tasklist)
+                complete_tab_layout.addWidget(page_widget)
+                complete_tab_widget = QFrame()
+                complete_tab_widget.setLayout(complete_tab_layout)
+
                 #for page in tab['history']:
                 #    new_tab.load(QUrl(page['url']))
                 #print tab['current_history']
@@ -182,10 +218,10 @@ class window(QMainWindow):
                 tab['current_history']
                 self.tabs.setUpdatesEnabled(False)
                 if self.new_tab_behavior == "insert":
-                    self.tabs.insertTab(self.tabs.currentIndex()+1, new_tab,
+                    self.tabs.insertTab(self.tabs.currentIndex()+1, complete_tab_widget,
                                         unicode(new_tab.title()))
                 elif self.new_tab_behavior == "append":
-                    self.tabs.appendTab(new_tab, unicode(new_tab.title()))
+                    self.tabs.appendTab(complete_tab_widget, unicode(new_tab.title()))
                 self.tabs.setUpdatesEnabled(True)
                 new_tab.titleChanged.connect(self.change_tab)
                 new_tab.urlChanged.connect(self.change_tab)
@@ -193,6 +229,7 @@ class window(QMainWindow):
                 new_tab.loadFinished.connect(self.load_finish)
                 new_tab.loadProgress.connect(self.pbar.setValue)
                 new_tab.page().linkHovered.connect(self.linkHover)
+                inspector.setPage(new_tab.page())
 
             for index, tab in enumerate(saved_tabs['tabs']):
                 self.tabs.setTabText(index, tab['history'][tab['current_history']]['title'])
@@ -201,7 +238,7 @@ class window(QMainWindow):
         else:
             self.new_tab()
 
-        tabs_layout = QHBoxLayout()
+        tabs_layout = QVBoxLayout()
         tabs_layout.setSpacing(0)
         tabs_layout.setContentsMargins(0, 0, 0, 0)
         tabs_layout.addWidget(self.tabs)
@@ -212,14 +249,10 @@ class window(QMainWindow):
         self.tabs_widget.setLayout(tabs_layout)
         self.tabs_widget.setVisible(True)
 
-        gsettings = self.tabs.currentWidget().settings().globalSettings()
+        gsettings = self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).settings().globalSettings()
         gsettings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         gsettings.setAttribute(QWebSettings.AcceleratedCompositingEnabled,
             True)
-
-        self.inspector = QWebInspector(self)
-        self.inspector.setPage(self.tabs.currentWidget().page())
-        self.inspector.hide()
 
         # Create a vertical layout and add widgets
         vlayout = QVBoxLayout()
@@ -228,21 +261,21 @@ class window(QMainWindow):
         # toolbar.addWidget(self.input_widget)
         vlayout.addWidget(self.input_widget)
         vlayout.addWidget(self.list)
-        vlayout.addWidget(self.tabs_widget, 1)
-        vlayout.addWidget(self.inspector)
+        vlayout.addWidget(self.tabs_widget)
 
         # create a widget to hold the vertical layout
         wrapper_widget = QWidget()
         wrapper_widget.setLayout(vlayout)
         self.setCentralWidget(wrapper_widget)
 
-        self.bbutton.clicked.connect(self.tabs.currentWidget().back)
-        self.fbutton.clicked.connect(self.tabs.currentWidget().forward)
+        self.bbutton.clicked.connect(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).back)
+        self.fbutton.clicked.connect(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).forward)
         self.hbutton.clicked.connect(self.goHome)
         self.edit.returnPressed.connect(self.set_url)
         # Add button signal to "go" slot
-        self.rbutton.clicked.connect(self.tabs.currentWidget().reload)
+        self.rbutton.clicked.connect(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).reload)
         self.dbutton.clicked.connect(self.bookmark)
+        self.tbutton.clicked.connect(self.toggleTaskBar)
         self.nbutton.clicked.connect(self.new_tab)
         self.tabs.tabCloseRequested.connect(self.tabs.removeTab)
         self.tabs.currentChanged.connect(self.change_tab)
@@ -265,7 +298,7 @@ class window(QMainWindow):
         QShortcut(sequence, self, self.toggle_fullscreen)
 
         # make an accelerator to toggle input visibility
-        sequence = QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_L)
+        sequence = QKeySequence(Qt.CTRL + Qt.ALT + Qt.Key_L)
         QShortcut(sequence, self, self.toggle_input)
 
         # make an accelerator to focus adress-bar
@@ -274,7 +307,7 @@ class window(QMainWindow):
 
         # make an accelerator to reload page
         sequence = QKeySequence(Qt.CTRL + Qt.Key_R)
-        QShortcut(sequence, self, self.tabs.currentWidget().reload)
+        QShortcut(sequence, self, self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).reload)
 
         # make an accelerator to create new tab
         sequence = QKeySequence(Qt.CTRL + Qt.Key_T)
@@ -294,6 +327,10 @@ class window(QMainWindow):
         sequence = QKeySequence(Qt.CTRL + Qt.ALT + Qt.Key_U)
         QShortcut(sequence, self, self.handleShowInspector)
 
+        # make an accelerator to toggle task/project-list
+        sequence = QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_L)
+        QShortcut(sequence, self, self.toggleTaskBar)
+
         # finally set the attribute need to rotate
         # try:
         #     self.setAttribute(Qt.WA_Maemo5AutoOrientation, True)
@@ -312,11 +349,16 @@ class window(QMainWindow):
 
     def goHome(self):
         """Go to startpage."""
-        self.tabs.currentWidget().setUrl(QUrl(self.startpage))
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).setUrl(QUrl(self.startpage))
 
     def handleShowInspector(self):
         """Toggle web inspector."""
-        self.inspector.setShown(self.inspector.isHidden())
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebInspector, unicode('webInspector')).setShown(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebInspector, unicode('webInspector')).isHidden())
+
+    def toggleTaskBar(self):
+        """Toggle task bar."""
+        self.tabs.currentWidget().findChild(QListWidget, unicode('taskList')).setShown(self.tabs.currentWidget().findChild(QListWidget, unicode('taskList')).isHidden())
+        #self.tasklist.setShown(self.tasklist.isHidden())
 
     def focus_adress(self):
         """Focus adress bar."""
@@ -337,6 +379,7 @@ class window(QMainWindow):
             self.showNormal()
         else:
             self.showFullScreen()
+        self.change_tab()
 
     def linkHover(self, l):
         """Show link adress in status bar on mouse hover."""
@@ -344,26 +387,56 @@ class window(QMainWindow):
 
     def new_tab(self):
         """Open new tab."""
-        tab = QWebView()
-        tab.load(QUrl(self.startpage))
+        tasklist = QListWidget()
+        tasklist.hide()
+        tasklist.setObjectName('taskList')
+        tasklist.setMinimumWidth(100)
+        tasklist.setMaximumWidth(250)
+
+        new_tab = QWebView()
+        new_tab.setObjectName('webView')
+
+        inspector = QWebInspector(self)
+        inspector.setObjectName('webInspector')
+        inspector.hide()
+
+        page_layout = QVBoxLayout()
+        page_layout.setSpacing(0)
+        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.addWidget(new_tab)
+        page_layout.addWidget(inspector)
+        page_widget = QFrame()
+        page_widget.setObjectName('pageWidget')
+        page_widget.setLayout(page_layout)
+
+        complete_tab_layout = QHBoxLayout()
+        complete_tab_layout.setSpacing(0)
+        complete_tab_layout.setContentsMargins(0, 0, 0, 0)
+        complete_tab_layout.addWidget(tasklist)
+        complete_tab_layout.addWidget(page_widget)
+        complete_tab_widget = QFrame()
+        complete_tab_widget.setLayout(complete_tab_layout)
+
+        new_tab.load(QUrl(self.startpage))
         self.tabs.setUpdatesEnabled(False)
         if self.new_tab_behavior == "insert":
-            self.tabs.insertTab(self.tabs.currentIndex()+1, tab,
-                                unicode(tab.title()))
+            self.tabs.insertTab(self.tabs.currentIndex()+1, complete_tab_widget,
+                                    unicode(new_tab.title()))
         elif self.new_tab_behavior == "append":
-            self.tabs.appendTab(tab, unicode(tab.title()))
-        self.tabs.setCurrentWidget(tab)
+            self.tabs.appendTab(complete_tab_widget, unicode(new_tab.title()))
+        self.tabs.setCurrentWidget(complete_tab_widget)
         self.tabs.setTabText(self.tabs.currentIndex(),
-                             unicode(self.tabs.currentWidget().title()))
+                             unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).title()))
         self.tabs.setUpdatesEnabled(True)
         # tab.page().mainFrame().setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         # tab.page().mainFrame().setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
-        tab.titleChanged.connect(self.change_tab)
-        tab.urlChanged.connect(self.change_tab)
-        tab.loadStarted.connect(self.load_start)
-        tab.loadFinished.connect(self.load_finish)
-        tab.loadProgress.connect(self.pbar.setValue)
-        tab.page().linkHovered.connect(self.linkHover)
+        new_tab.titleChanged.connect(self.change_tab)
+        new_tab.urlChanged.connect(self.change_tab)
+        new_tab.loadStarted.connect(self.load_start)
+        new_tab.loadFinished.connect(self.load_finish)
+        new_tab.loadProgress.connect(self.pbar.setValue)
+        new_tab.page().linkHovered.connect(self.linkHover)
+        inspector.setPage(new_tab.page())
 
     def change_tab(self):
         """Change active tab."""
@@ -373,15 +446,15 @@ class window(QMainWindow):
             self.tabs.tabBar().show()
 
         try:
-            self.edit.setText(str(self.tabs.currentWidget().url().toEncoded()))
+            self.edit.setText(str(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
             self.tabs.setTabText(self.tabs.currentIndex(),
-                                 unicode(self.tabs.currentWidget().title()))
-            self.tabs.currentWidget().setFocus()
+                                 unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).title()))
+            self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).setFocus()
         except Exception:
             self.tabs.tabBar().hide()
             self.new_tab()
 
-        print (self.tabs.widget(self.tabs.currentIndex()).size().width()-10), self.tabs.count()
+        #print (self.tabs.widget(self.tabs.currentIndex()).size().width()-10), self.tabs.count()
         self.tabs_widget.setStyleSheet(self.style_sheet +
                                        "QTabBar::tab { width:" + str(
                                         (self.tabs.widget(
@@ -424,57 +497,61 @@ class window(QMainWindow):
         elif not url.startswith("http://"):
             url = "http://" + url
         qurl = QUrl(url)
-        self.tabs.currentWidget().load(qurl)
-        self.tabs.currentWidget().setFocus()
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).load(qurl)
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).setFocus()
 
     def load_start(self):
         """Update view values, called upon started page load."""
         self.rbutton.setText(u"╳")
-        self.rbutton.clicked.connect(self.tabs.currentWidget().stop)
+        self.rbutton.clicked.connect(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).stop)
         self.pbar.show()
 
     def load_finish(self):
         """Update view values, called upon finished page load."""
-        if (self.tabs.currentWidget().history().canGoBack()):
+        if (self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).history().canGoBack()):
             self.bbutton.setEnabled(True)
         else:
             self.bbutton.setEnabled(False)
-        if (self.tabs.currentWidget().history().canGoForward()):
+        if (self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).history().canGoForward()):
             self.fbutton.setEnabled(True)
         else:
             self.fbutton.setEnabled(False)
 
         self.rbutton.setText(u"↻")
-        self.rbutton.clicked.connect(self.tabs.currentWidget().reload)
+        self.rbutton.clicked.connect(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).reload)
         self.pbar.hide()
 
         global bookmarks
-        if unicode(self.tabs.currentWidget().url().toEncoded()) in bookmarks:
+        if unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()) in bookmarks:
             self.dbutton.setText(u"★")
         else:
             self.dbutton.setText(u"☆")
 
+        if not self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebInspector, unicode('webInspector')).isHidden():
+            self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebInspector, unicode('webInspector')).hide()
+            self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebInspector, unicode('webInspector')).show()
+
     def bookmark(self):
         """Toggle bookmark."""
         global bookmarks
-        if not self.tabs.currentWidget().url().toEncoded() in bookmarks:
-            bookmarks.append(self.tabs.currentWidget().url().toEncoded())
+        if not self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded() in bookmarks:
+            bookmarks.append(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())
 
             pickle.dump(bookmarks, open(bookFile, "wb"))
 
-            self.list.addItem(unicode(self.tabs.currentWidget().url().toEncoded()))
+            self.list.addItem(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
             self.dbutton.setText(u"★")
 
         else:
-            if self.tabs.currentWidget().url().toEncoded() in bookmarks: bookmarks.remove(self.tabs.currentWidget().url().toEncoded())
+            if self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded() in bookmarks: bookmarks.remove(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())
             pickle.dump(bookmarks, open(bookFile, "wb"))
-            self.list.removeItem(self.list.findText(unicode(self.tabs.currentWidget().url().toEncoded())))
+            self.list.removeItem(self.list.findText(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())))
             self.dbutton.setText(u"☆")
 
     def handleBookmarks(self, choice):
 
         url = choice
-        self.tabs.currentWidget().load(QUrl(self.startpage))
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).load(QUrl(self.startpage))
 
     def styleSheet(self, style_sheet):
         """Load stylesheet."""
@@ -500,9 +577,9 @@ class window(QMainWindow):
         pb['tabs'] = list()
         for tab in range(self.tabs.count()):
             pb['tabs'].append(dict(current_history=self.tabs.widget(
-                tab).history().currentItemIndex(), history=list(dict(
+                tab).findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).history().currentItemIndex(), history=list(dict(
                     title=item.title(), url=item.url()
-                    ) for item in self.tabs.widget(tab).history().items())))
+                    ) for item in self.tabs.widget(tab).findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).history().items())))
 
         # print pb
         pickle.dump(pb, open(tabFile, "wb"))

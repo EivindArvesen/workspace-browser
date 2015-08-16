@@ -43,7 +43,7 @@ While most modern browsers are able to bookmark numerous tabs at once (e.g. as a
 Modern browsers generally have the ability to "remember" (reopen) windows and tabs from the previous session on launch.
 This approach can result in clutter, many open windows, and potentially performance issues.
 #####Task-based approach
-Saves a collection of tabs (and windows), reducing both visual clutter and CPU load. Use of this approach also discourages multitasking - cognitive context switching is generally accepted to impede performance - and facilitates the widely used strategy of organizing related tasks in groups.
+Saves a collection of tabs (and windows), reducing visual clutter as well as CPU load and RAM usage. Use of this approach also discourages multitasking - cognitive context switching is generally accepted to impede performance - and facilitates the widely used strategy of organizing related tasks in groups.
 
 ## Installation
 Binaries can be downloaded from the [releases](https://github.com/eivind88/raskolnikov/releases) page.
@@ -55,34 +55,41 @@ Alternatively, you can install Raskolnikov in one of the following ways:
 ### Automatic environment setup
 If you don't have Python installed, already have the [Anaconda Python distribution](https://store.continuum.io/cshop/anaconda/) installed or don't have any preference regarding Python distribution, the included `setup.sh` can set up a development environment for you.
 Running
-```
+
+```shell
 bash dev/setup.sh
 ```
+
 will check if the default Anaconda Python path exists, and download and install the latest [miniconda distribution](http://conda.pydata.org/miniconda.html) if it doesn't.
 The script then creates a [conda](http://conda.pydata.org/docs/) environment from `requirements.txt`.
 
-To start using the environment, activate it with `source activate browser-dev`.
-When you're done, you can deactivate it with `source deactivate browser-dev`.
+To start using the environment, activate it with `source activate raskolnikov-dev`.
+When you're done, you can deactivate it with `source deactivate raskolnikov-dev`.
 
 ### Manual environment setup
 If you'd like to set up the development manually, the included `requirements.txt` can be used with virtualenv.
 
 With virtualenv, this should go something like
-```
+
+```shell
 pip install -r requirements.txt
 ```
+
 once you have created and activated an environment.
 
 If you'd like to build the application yourself, you also need to install PyInstaller manually:
-```
+
+```shell
 pip install git+https://github.com/pyinstaller/pyinstaller.git@develop
 ```
 
 ### Distribution
 To prepare the application for distribution after setting up the development environment, run:
-```
+
+```shell
 bash dev/build.sh
 ```
+
 This script runs PyInstaller on the included ```main.spec```,
 and outputs a packaged application in a newly created folder ```dist```.
 
@@ -93,9 +100,11 @@ UPDATE THIS AFTER NOSETESTS ARE WRITTEN!
 ### Tests
 There are 3 types of tests: `jest`, `jscs` and `jsxhint`.
 To run the tests:
-```
+
+```shell
 npm test
 ```
+
 -->
 
 ## Contributions
@@ -107,9 +116,11 @@ Contributions in the form of code (e.g. implementing new features, bug-fixes) ar
 Just fork the repo, check out a new branch with an informative name, commit your changes and send a pull request.
 
 In the case of any new dependencies, running
-```
+
+```shell
 bash dev/export-env.sh
 ```
+
 will automatically export your environment and update the ```requirements.txt``` (provided you are using a conda env).
 
 ## License

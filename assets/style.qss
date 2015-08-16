@@ -20,7 +20,7 @@ QTabBar::tab {
     border: 1px solid rgba(165, 165, 165);
     border-radius: 0;
     color: rgba(74, 74, 74);
-    min-width: 8ex;
+    min-width: 16ex;
     padding: 5px 7px 5px -7px;
 }
 
@@ -113,6 +113,11 @@ QStatusBar {
 
 QScrollBar {
     background: #32CC99;
+}
+
+QListWidget {
+    background: rgba(246, 246, 246);
+    min-width: 16ex;
 }
 
 /* The following is not currently applied to any widget */
