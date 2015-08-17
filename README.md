@@ -17,24 +17,32 @@ For instance:
 
 Raskolnikov is an experimental, task based web browser.
 
-You can think of this as automatically saving a project or workspace (currently open windows and their tabs).
+This can be thought of as automatically saving a project or workspace (i.e. currently open windows and their tabs).
 
 The browser is named after Raksolnikov (of Dostoevsky's Crime and Punishment), since its use is built around schismatization.
 It is based on webkit (via the PySide Qt-binding), and programmed in Python.
 
 ###Proof of concept
+The purpose of this application prototype is to illustrate the concept of task based browsing.
+While it certainly is usable in its current state, it is not recommended for usage as a main web browser.
+Should there be marked interest in the features this software provides, it will likely be reimplemented as extensions for the major modern browsers.
+
 This application is still in a very early, experimental stage,
 and neither performance nor stability is up to par at this point.
+
+Security has _not_ been focused on as of yet, and as a result **the browser can not be considered secure**.
+
+Furthermore, not all browser plugins are available at present - Flash has some trouble, and Java Applets are not supported at all.
 
 ####Use case
 Let us say you are doing research for your thesis, jumping between dozens of open tabs.
 
 When you are done for the day you'd like to look for a new apartment.
 
-* You open the web browsers task-list by clicking the task button in the toolbar,
+* You open the web browser's task-list by clicking the task button in the toolbar, and
 * open another task by clicking a task title from the list.
 
-This implicitly saves and closes the window(s) and tabs assosiated with the previous task, and opens the saved window(s) and tabs associated with the opened task.
+This implicitly saves and closes the window(s) and tabs assosiated with the previous task, and opens the saved window(s) and tabs associated with the clicked task.
 
 ####Justification vis-à-vis alternatives
 #####Bookmarks

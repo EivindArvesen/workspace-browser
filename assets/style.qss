@@ -73,9 +73,26 @@ QWidget {
 }
 
 #BookmarkWidget {
+    min-height: 24px;
     border-top: 1px solid rgba(197, 197, 197);
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 rgba(219, 219, 219), stop: 1.0 rgba(213, 213, 213));
+}
+
+QToolButton {
+    background: none;
+    border: none;
+    border-radius: 2px 2px 2px 2px;
+}
+
+QToolButton:hover {
+    background-color: rgba(170, 170, 170);
+    color: rgba(255, 255, 255);
+}
+
+QToolButton:pressed {
+    background-color: rgba(109, 109, 109);
+    color: rgba(255, 255, 255);
 }
 
 #TabLine {
@@ -115,7 +132,7 @@ QScrollBar {
     background: #32CC99;
 }
 
-QListWidget {
+QTreeView {
     background: rgba(246, 246, 246);
     min-width: 16ex;
 }

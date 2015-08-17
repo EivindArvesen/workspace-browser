@@ -12,7 +12,8 @@ from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
 from PySide.QtGui import QIcon, QStyleFactory, QFrame, QDesktopServices
-from PySide.QtGui import QComboBox, QSizePolicy, QListWidget
+from PySide.QtGui import QComboBox, QSizePolicy, QTreeView, QStandardItemModel
+from PySide.QtGui import QStandardItem, QToolButton, QAction
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
 homedir = os.path.expanduser('~')
@@ -152,17 +153,39 @@ class window(QMainWindow):
         self.input_widget.setVisible(True)
 
         # CREATE BOOKMARK-LINE HERE
-        self.list = QComboBox(self)
-        self.list.setMinimumSize(35,30)
+        self.bookmarks_layout = QHBoxLayout()
+        self.bookmarks_layout.setSpacing(0)
+        self.bookmarks_layout.setContentsMargins(0, 0, 0, 0)
 
         for i in bookmarks:
-            self.list.addItem(unicode(i))
+            link = QToolButton()
+            link.setDefaultAction(QAction(unicode(i), link))
+            link.setObjectName(unicode(i))
+            link.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
+            self.bookmarks_layout.addWidget(link)
+
+        self.bookmarks_widget = QFrame()
+        self.bookmarks_widget.setObjectName("BookmarkWidget")
+        self.bookmarks_widget.setStyleSheet(self.style_sheet)
+        self.bookmarks_widget.setLayout(self.bookmarks_layout)
+
+        if not bookmarks:
+            self.bookmarks_widget.hide()
 
         # Task list
-        #self.tasklist = LOAD
+        self.tasklist = QStandardItemModel()
+        #parentItem = self.tasklist.invisibleRootItem()
+        #self.tasklist.header().hide()
+        self.tasklist.setHorizontalHeaderItem(0, QStandardItem('Tasks'))
+        parentItem = QStandardItem("Parent")
+        self.tasklist.appendRow(parentItem)
+        for i in range(4):
+            item = QStandardItem("Item %d" % i)
+            parentItem.appendRow(item)
+            #parentItem = item
 
-        self.list.activated[str].connect(self.handleBookmarks)
-        self.list.view().setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
+        #self.list.activated[str].connect(self.handleBookmarks)
+        #self.list.view().setSizePolicy(QSizePolicy.Minimum,QSizePolicy.Minimum)
 
         # create tabs
         self.tabs = QTabWidget()
@@ -178,7 +201,7 @@ class window(QMainWindow):
 
         if saved_tabs:
             for tab in saved_tabs['tabs']:
-                tasklist = QListWidget()
+                tasklist = QTreeView()
                 tasklist.hide()
                 tasklist.setObjectName('taskList')
                 tasklist.setMinimumWidth(100)
@@ -249,10 +272,24 @@ class window(QMainWindow):
         self.tabs_widget.setLayout(tabs_layout)
         self.tabs_widget.setVisible(True)
 
+        # Webkit settings
         gsettings = self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).settings().globalSettings()
+        # Basic settings
+        gsettings.setAttribute(QWebSettings.AutoLoadImages, True)
+        gsettings.setAttribute(QWebSettings.JavascriptEnabled, True)
+        gsettings.setAttribute(QWebSettings.JavascriptCanOpenWindows, False)
+        gsettings.setAttribute(QWebSettings.JavascriptCanAccessClipboard, False)
+        gsettings.setAttribute(QWebSettings.PluginsEnabled, False) # Flash isn't stable at present
+        gsettings.setAttribute(QWebSettings.JavaEnabled, False) # Java applet's aren't supported by PySide
         gsettings.setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         gsettings.setAttribute(QWebSettings.AcceleratedCompositingEnabled,
             True)
+        # Performace settings
+        gsettings.setAttribute(QWebSettings.DnsPrefetchEnabled, True)
+        gsettings.setAttribute(QWebSettings.AcceleratedCompositingEnabled, True)
+        gsettings.setAttribute(QWebSettings.DnsPrefetchEnabled, True)
+        # Other settings
+        gsettings.setAttribute(QWebSettings.PrivateBrowsingEnabled, False)
 
         # Create a vertical layout and add widgets
         vlayout = QVBoxLayout()
@@ -260,7 +297,7 @@ class window(QMainWindow):
         vlayout.setContentsMargins(0, 0, 0, 0)
         # toolbar.addWidget(self.input_widget)
         vlayout.addWidget(self.input_widget)
-        vlayout.addWidget(self.list)
+        vlayout.addWidget(self.bookmarks_widget)
         vlayout.addWidget(self.tabs_widget)
 
         # create a widget to hold the vertical layout
@@ -327,6 +364,10 @@ class window(QMainWindow):
         sequence = QKeySequence(Qt.CTRL + Qt.ALT + Qt.Key_U)
         QShortcut(sequence, self, self.handleShowInspector)
 
+        # make an accelerator to toggle bookmark
+        sequence = QKeySequence(Qt.CTRL + Qt.Key_D)
+        QShortcut(sequence, self, self.bookmark)
+
         # make an accelerator to toggle task/project-list
         sequence = QKeySequence(Qt.CTRL + Qt.SHIFT + Qt.Key_L)
         QShortcut(sequence, self, self.toggleTaskBar)
@@ -357,7 +398,9 @@ class window(QMainWindow):
 
     def toggleTaskBar(self):
         """Toggle task bar."""
-        self.tabs.currentWidget().findChild(QListWidget, unicode('taskList')).setShown(self.tabs.currentWidget().findChild(QListWidget, unicode('taskList')).isHidden())
+        if self.tabs.currentWidget().findChild(QTreeView, unicode('taskList')).isHidden():
+            self.tabs.currentWidget().findChild(QTreeView, unicode('taskList')).setModel(self.tasklist)
+        self.tabs.currentWidget().findChild(QTreeView, unicode('taskList')).setShown(self.tabs.currentWidget().findChild(QTreeView, unicode('taskList')).isHidden())
         #self.tasklist.setShown(self.tasklist.isHidden())
 
     def focus_adress(self):
@@ -387,7 +430,7 @@ class window(QMainWindow):
 
     def new_tab(self):
         """Open new tab."""
-        tasklist = QListWidget()
+        tasklist = QTreeView()
         tasklist.hide()
         tasklist.setObjectName('taskList')
         tasklist.setMinimumWidth(100)
@@ -536,16 +579,29 @@ class window(QMainWindow):
         global bookmarks
         if not self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded() in bookmarks:
             bookmarks.append(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())
-
             pickle.dump(bookmarks, open(bookFile, "wb"))
+            link = QToolButton()
+            link.setDefaultAction(QAction(unicode(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())), link))
+            link.setObjectName(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
+            link.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
+            self.bookmarks_layout.addWidget(link)
 
-            self.list.addItem(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
+            if self.bookmarks_widget.isHidden():
+                self.bookmarks_widget.show()
+
             self.dbutton.setText(u"★")
 
         else:
-            if self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded() in bookmarks: bookmarks.remove(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())
+            bookmarks.remove(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())
             pickle.dump(bookmarks, open(bookFile, "wb"))
-            self.list.removeItem(self.list.findText(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())))
+            link = self.bookmarks_widget.findChild(QToolButton, unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
+            self.bookmarks_layout.removeWidget(link)
+            link.deleteLater()
+            link = None
+
+            if not bookmarks:
+                self.bookmarks_widget.hide()
+
             self.dbutton.setText(u"☆")
 
     def handleBookmarks(self, choice):
