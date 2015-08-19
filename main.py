@@ -7,12 +7,12 @@ import signal
 import sys
 import tempfile
 # import just what is needed
-from PySide.QtCore import Qt, SLOT, QUrl, QSettings, SIGNAL
+from PySide.QtCore import Qt, SLOT, QUrl, QSettings
 from PySide.QtGui import QApplication, QWidget, QMainWindow, QHBoxLayout
 from PySide.QtGui import QLineEdit, QPushButton, QVBoxLayout, QKeySequence
 from PySide.QtGui import QShortcut, QTabWidget, QMenuBar, QFont, QProgressBar
-from PySide.QtGui import QIcon, QStyleFactory, QFrame, QDesktopServices
-from PySide.QtGui import QComboBox, QSizePolicy, QTreeView, QStandardItemModel
+from PySide.QtGui import QIcon, QFrame, QDesktopServices
+from PySide.QtGui import QSizePolicy, QTreeView, QStandardItemModel
 from PySide.QtGui import QStandardItem, QToolButton, QAction
 from PySide.QtWebKit import QWebView, QWebSettings, QWebInspector
 
@@ -162,6 +162,8 @@ class window(QMainWindow):
             link.setDefaultAction(QAction(unicode(i), link))
             link.setObjectName(unicode(i))
             link.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
+            link.clicked.connect(self.handleBookmarks)
+
             self.bookmarks_layout.addWidget(link)
 
         self.bookmarks_widget = QFrame()
@@ -508,20 +510,26 @@ class window(QMainWindow):
     def previous_tab(self):
         """Previous tab."""
         try:
-            self.tabs.setCurrentIndex(self.tabs.currentIndex()-1)
+            if self.tabs.currentIndex() > 0:
+                self.tabs.setCurrentIndex(self.tabs.currentIndex()-1)
+            else:
+                self.tabs.setCurrentIndex(self.tabs.count()-1)
+
             self.change_tab()
         except Exception:
             pass
-            #print str(e)
 
     def next_tab(self):
         """Next tab."""
         try:
-            self.tabs.setCurrentIndex(self.tabs.currentIndex()+1)
+            if self.tabs.currentIndex() < self.tabs.count()-1:
+                self.tabs.setCurrentIndex(self.tabs.currentIndex()+1)
+            else:
+                self.tabs.setCurrentIndex(0)
+
             self.change_tab()
         except Exception: #, e
             pass
-            # print str(e)
 
     def close_tab(self):
         """Close tab."""
@@ -584,6 +592,7 @@ class window(QMainWindow):
             link.setDefaultAction(QAction(unicode(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded())), link))
             link.setObjectName(unicode(self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).url().toEncoded()))
             link.setFont(QFont("Helvetica Neue", 11, QFont.Normal))
+            link.clicked.connect(self.handleBookmarks)
             self.bookmarks_layout.addWidget(link)
 
             if self.bookmarks_widget.isHidden():
@@ -604,10 +613,14 @@ class window(QMainWindow):
 
             self.dbutton.setText(u"☆")
 
-    def handleBookmarks(self, choice):
+    def handleBookmarks(self):
 
-        url = choice
-        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).load(QUrl(self.startpage))
+        self.gotoLink(self.sender().objectName())
+        #self.gotoLink(unicode())
+
+    def gotoLink(self, url):
+
+        self.tabs.currentWidget().findChild(QFrame, unicode('pageWidget')).findChild(QWebView, unicode('webView')).load(QUrl(url))
 
     def styleSheet(self, style_sheet):
         """Load stylesheet."""
