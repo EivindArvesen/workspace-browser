@@ -74,6 +74,8 @@ The script then creates a [conda](http://conda.pydata.org/docs/) environment fro
 To start using the environment, activate it with `source activate raskolnikov-dev`.
 When you're done, you can deactivate it with `source deactivate raskolnikov-dev`.
 
+The automatic environment setup script should work for modern 64-bit versions of OS X, Linux and Windows (Cygwin).
+
 ### Manual environment setup
 If you'd like to set up the development manually, the included `requirements.txt` can be used with virtualenv.
 
