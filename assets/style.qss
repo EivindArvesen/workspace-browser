@@ -8,7 +8,7 @@ QTabWidget::pane { /* The tab widget frame */
 
 QTabWidget::tab-bar {
     alignment: left;
-    min-height: 32px;
+   /*  min-height: 32px; */
 }
 
 /* Style the tab using the tab sub-control. Note that

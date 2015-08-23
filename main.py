@@ -191,7 +191,7 @@ class window(QMainWindow):
 
         # create tabs
         self.tabs = QTabWidget()
-        self.tabs.setDocumentMode(False)
+        self.tabs.setDocumentMode(True)
         self.tabs.setTabsClosable(True)
         self.tabs.setMovable(True)
         self.tabs.tabBar().hide()
