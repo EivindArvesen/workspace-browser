@@ -1,12 +1,10 @@
 # Raskolnikov
-<!--
-Build icons, etc.
-For instance:
+
 [![docs][docs-image]][docs-url]
 [![travis][travis-image]][travis-url]
 [![coveralls][coveralls-image]][coveralls-url]
 [![license][license-image]][license-url]
-[docs-image]: https://readthedocs.org/projects/raskolnikov/?badge=latest
+[docs-image]: https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat
 [docs-url]: http://raskolnikov.readthedocs.org
 [travis-image]: https://travis-ci.org/eivind88/raskolnikov.svg?branch=master
 [travis-url]: https://travis-ci.org/eivind88/raskolnikov
@@ -14,7 +12,6 @@ For instance:
 [coveralls-url]: https://coveralls.io/github/eivind88/raskolnikov
 [license-image]: http://img.shields.io/badge/license-BSD3-brightgreen.svg
 [license-url]: https://github.com/eivind88/raskolnikov/blob/master/LICENSE.txt
--->
 
 ![Screenshot](res/small_icon.png)
 
@@ -108,17 +105,21 @@ and outputs a packaged application in a newly created folder ```dist```.
 
 Currently supports only OS X.
 
-<!--
-UPDATE THIS AFTER NOSETESTS ARE WRITTEN!
 ### Tests
-There are 3 types of tests: `jest`, `jscs` and `jsxhint`.
-To run the tests:
+To run the project unit tests, run ```nosetests``` from the project root, or run:
 
 ```shell
-nosetests
+bash dev/run-tests.sh
 ```
 
--->
+to run the tests with coverage.
+
+### Documentation
+The documentation can be built locally via sphinx by running ```sphinx-apidoc```, or:
+
+```shell
+bash dev/generate-docs.sh
+```
 
 ## Contributions
 Feedback is very much appreciated.
