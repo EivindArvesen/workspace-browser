@@ -9,7 +9,7 @@ a = Analysis(
  [
  #os.path.join(HOMEPATH,'support/_mountzlib.py'),
  #os.path.join(CONFIGDIR,'support/useUnicode.py'),
- 'main.py'
+ 'raskolnikov/main.py'
  ],
  pathex=[root],
  hiddenimports=['PySide.QtNetwork'],
@@ -17,7 +17,7 @@ a = Analysis(
  runtime_hooks=None,
  excludes=None)
 
-extrafiles = [(os.path.join("assets", 'style.qss'), os.path.join("assets", 'style.qss'), 'DATA')]
+extrafiles = [(os.path.join("assets", 'style.qss'), os.path.join("raskolnikov", "assets", 'style.qss'), 'DATA')]
 
 pyz = PYZ (a.pure)
 exe = EXE( pyz,

@@ -2,15 +2,18 @@
 <!--
 Build icons, etc.
 For instance:
+[![docs][docs-image]][docs-url]
 [![travis][travis-image]][travis-url]
-[![cc-gpa][cc-gpa-image]][cc-gpa-url]
-[![cc-coverage][cc-coverage-image]][cc-coverage-url]
-[travis-image]: https://travis-ci.org/ekonstantinidis/gitify.svg?branch=master
-[travis-url]: https://travis-ci.org/ekonstantinidis/gitify
-[cc-gpa-image]: https://codeclimate.com/github/ekonstantinidis/gitify/badges/gpa.svg
-[cc-gpa-url]: https://codeclimate.com/github/ekonstantinidis/gitify
-[cc-coverage-image]: https://codeclimate.com/github/ekonstantinidis/gitify/badges/coverage.svg
-[cc-coverage-url]: https://codeclimate.com/github/ekonstantinidis/gitify/coverage
+[![coveralls][coveralls-image]][coveralls-url]
+[![license][license-image]][license-url]
+[docs-image]: https://readthedocs.org/projects/raskolnikov/?badge=latest
+[docs-url]: http://raskolnikov.readthedocs.org
+[travis-image]: https://travis-ci.org/eivind88/raskolnikov.svg?branch=master
+[travis-url]: https://travis-ci.org/eivind88/raskolnikov
+[coveralls-image]: https://coveralls.io/repos/eivind88/raskolnikov/badge.svg?branch=master&service=github
+[coveralls-url]: https://coveralls.io/github/eivind88/raskolnikov
+[license-image]: http://img.shields.io/badge/license-BSD3-brightgreen.svg
+[license-url]: https://github.com/eivind88/raskolnikov/blob/master/LICENSE.txt
 -->
 
 ![Screenshot](res/small_icon.png)
@@ -112,7 +115,7 @@ There are 3 types of tests: `jest`, `jscs` and `jsxhint`.
 To run the tests:
 
 ```shell
-npm test
+nosetests
 ```
 
 -->
@@ -131,7 +134,13 @@ In the case of any new dependencies, running
 bash dev/export-env.sh
 ```
 
-will automatically export your environment and update the ```requirements.txt``` (provided you are using a conda env).
+will automatically export your environment and update the ```requirements.txt```, provided you are using a conda env. If you are using virtualenv, you can run
+
+```shell
+pip freeze > requirements.txt
+```
+
+to do the same.
 
 ## License
 This software is released under the terms of the 3-clause New BSD License. See the [license](LICENSE.txt) file for details.
