@@ -34,7 +34,7 @@ try:
     b.close()
 except Exception, e:
     # print e
-    file = open(tabFile, "w")
+    file = open(tabFile, "wb")
     for line in '':
         file.write(line)
     file.close()
@@ -47,7 +47,7 @@ try:
     c.close()
 except Exception, e:
     print e
-    file = open(bookFile, "w")
+    file = open(bookFile, "wb")
     for line in '':
         file.write(line)
     file.close()
