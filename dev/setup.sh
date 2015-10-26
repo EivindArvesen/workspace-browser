@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ENV=raskolnikov-dev
+ENV=raskolnikov-browser
 
 # Install Miniconda if there if the default Anaconda-path is not present.
 if [ "$(uname)" == "Darwin" ]; then

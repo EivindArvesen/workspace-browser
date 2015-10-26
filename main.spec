@@ -1,7 +1,7 @@
 #-*- mode: python -*-
 import os, sys, shutil
 
-root = os.path.dirname(os.path.realpath(__file__))
+root = os.path.dirname(os.path.realpath('__file__'))
 version = "0.0.1"
 appname = "Raskolnikov"
 
