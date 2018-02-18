@@ -1,10 +1,10 @@
-# Browser Prototype (Raskolnikov)
+# Browser Prototype
 ### Proof of concept
-As this codebase has served its purpose of allowing me to experiment with how the desired functionality (task based web browsing) should look, it is no longer under development.
+As this codebase has served its purpose of allowing me to experiment with how the desired functionality (task based web browsing) should look, it is no longer under active development.
 
-My current focus is to implement an [application that brings task focused functionality to the OS level](https://github.com/eivind88/raskolnikov), and to document task focused computer interaction in a paper.
+My current focus is to implement an application that brings task focused functionality to the OS level, and to document task focused computer interaction in a paper.
 
-I will likely reimplement the features this software illustrates as extensions for the major modern browsers.
+I will likely reimplement the features this software illustrates as extensions for the major modern browsers, or in a Chromium derivative.
 
 ---
 
